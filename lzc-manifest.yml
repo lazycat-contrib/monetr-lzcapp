@@ -1,0 +1,72 @@
+application:
+  subdomain: monetr
+  background_task: true
+  multi_instance: false
+  public_path:
+    - /
+  upstreams:
+    - location: /
+      backend: http://monetr:4000/
+
+services:
+  postgres:
+    # upstream: postgres:17 (docker.io)
+    image: docker.1ms.run/postgres:17
+    environment:
+      - POSTGRES_PASSWORD={{ stable_secret "pg_password" }}
+      - POSTGRES_USER=monetr
+      - POSTGRES_DB=monetr
+    binds:
+      - /lzcapp/var/postgres:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - pg_isready -U monetr
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  valkey:
+    # upstream: valkey/valkey:9 (docker.io)
+    image: docker.1ms.run/valkey/valkey:9
+    healthcheck:
+      test:
+        - CMD
+        - valkey-cli
+        - ping
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+
+  monetr:
+    # upstream: ghcr.io/monetr/monetr:1.19.0
+    image: ghcr.1ms.run/monetr/monetr:1.19.0
+    depends_on:
+      - postgres
+      - valkey
+    command: "serve --migrate --generate-certificates"
+    environment:
+      - MONETR_ALLOW_SIGN_UP=true
+      - MONETR_PG_USERNAME=monetr
+      - MONETR_PG_PASSWORD={{ stable_secret "pg_password" }}
+      - MONETR_PG_DATABASE=monetr
+      - MONETR_PG_ADDRESS=postgres
+      - MONETR_REDIS_ENABLED=true
+      - MONETR_REDIS_ADDRESS=valkey
+      - MONETR_STORAGE_ENABLED=true
+      - MONETR_STORAGE_PROVIDER=filesystem
+      # 外部 URL（Cookie 与邮件链接用）；TLS 由 LazyCat 网关终止
+      - MONETR_SERVER_EXTERNAL_URL=https://${LAZYCAT_SUBDOMAIN}.${LAZYCAT_BOX_DOMAIN}
+    binds:
+      - /lzcapp/var/monetr:/etc/monetr
+    healthcheck:
+      test:
+        - CMD
+        - /usr/bin/monetr
+        - status
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 10s

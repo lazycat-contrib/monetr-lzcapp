@@ -1,0 +1,15 @@
+package: community.lazycat.app.monetr
+version: 1.19.0
+name: monetr
+description: "Budgeting application focused on planning for recurring expenses"
+min_os_version: 1.5.0
+author: monetr
+license: LicenseRef-NOASSERTION
+homepage: https://github.com/monetr/monetr
+locales:
+  zh:
+    name: "monetr"
+    description: "预算管理应用：专注于周期性支出的规划，支持银行同步（Plaid）、支出预测与多账户"
+  en:
+    name: "monetr"
+    description: "monetr is a budgeting application focused on planning for recurring expenses"
