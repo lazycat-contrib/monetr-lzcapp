@@ -38,8 +38,8 @@ services:
       retries: 3
       start_period: 5s
   monetr:
-    # upstream: ghcr.io/monetr/monetr:1.20.0
-    image: ghcr.1ms.run/monetr/monetr:1.20.0
+    # upstream: ghcr.io/monetr/monetr:1.21.0
+    image: ghcr.1ms.run/monetr/monetr:1.21.0
     depends_on:
       - postgres
       - valkey
