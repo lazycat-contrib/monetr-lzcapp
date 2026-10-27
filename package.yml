@@ -1,5 +1,5 @@
 package: community.lazycat.app.monetr
-version: 1.21.0
+version: 1.21.1
 name: monetr
 description: "Budgeting application focused on planning for recurring expenses"
 min_os_version: 1.5.0
